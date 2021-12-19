@@ -20,6 +20,12 @@ namespace CreationApp.Controllers
             return View(await _context.Users.ToListAsync());
         }
 
+        public async Task<IActionResult> ActiveUsers()
+        {
+            var users = await _context.Users.Where(x => x.Active).ToListAsync();
+            return View(users);
+        }
+
         public IActionResult Create()
         {
             return View();
