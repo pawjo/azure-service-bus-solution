@@ -1,5 +1,3 @@
-using System;
-
 namespace CreationApp.Models
 {
     public class ErrorViewModel

@@ -1,29 +1,29 @@
 ﻿using CreationApp.Models;
+using CreationApp.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CreationApp.Controllers
 {
     public class UsersController : Controller
     {
-        private readonly DataContext _context;
+        private readonly IUserService _userService;
 
-        public UsersController(DataContext context)
+        public UsersController(IUserService userService)
         {
-            _context = context;
+            _userService = userService;
         }
 
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Users.ToListAsync());
+            var list = await _userService.GetListAsync();
+            return View(list);
         }
 
         public async Task<IActionResult> ActiveUsers()
         {
-            var users = await _context.Users.Where(x => x.Active).ToListAsync();
-            return View(users);
+            var list = await _userService.GetActiveListAsync();
+            return View(list);
         }
 
         public IActionResult Create()
@@ -37,9 +37,11 @@ namespace CreationApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(user);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                bool result = await _userService.AddAsync(user);
+                if (result)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
             }
             return View(user);
         }
@@ -51,7 +53,7 @@ namespace CreationApp.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Users.FindAsync(id);
+            var user = await _userService.GetByIdAsync(id.Value);
             if (user == null)
             {
                 return NotFound();
@@ -70,30 +72,13 @@ namespace CreationApp.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                var result = await _userService.UpdateAsync(user);
+                if (result)
                 {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserExists(user.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
             }
             return View(user);
-        }
-
-        private bool UserExists(int id)
-        {
-            return _context.Users.Any(e => e.Id == id);
         }
     }
 }

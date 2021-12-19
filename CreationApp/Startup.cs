@@ -1,3 +1,4 @@
+using CreationApp.Services;
 using CreationApp.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -23,6 +24,8 @@ namespace CreationApp
             var serviceBusSettings = new ServiceBusSettings();
             Configuration.Bind(nameof(serviceBusSettings), serviceBusSettings);
             services.AddSingleton(serviceBusSettings);
+
+            services.AddScoped<IUserService, UserService>();
 
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("Default")));
