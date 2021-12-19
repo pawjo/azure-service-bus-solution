@@ -1,5 +1,6 @@
 ﻿using CreationApp.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,10 +10,12 @@ namespace CreationApp.Services
     public class UserService : IUserService
     {
         private readonly DataContext _dataContext;
+        private readonly IMessagingService _messagingService;
 
-        public UserService(DataContext dataContext)
+        public UserService(DataContext dataContext, IMessagingService messagingService)
         {
             _dataContext = dataContext;
+            _messagingService = messagingService;
         }
 
         public async Task<bool> AddAsync(User newUser)
@@ -20,7 +23,13 @@ namespace CreationApp.Services
             _dataContext.Users.Add(newUser);
             var added = await _dataContext.SaveChangesAsync();
 
-            return added == 1;
+            if (added == 1)
+            {
+                await _messagingService.SendMessageAsync("User created " + DateTime.Now);
+                return true;
+            }
+
+            return false;
         }
 
         public async Task<List<User>> GetActiveListAsync()
@@ -55,7 +64,13 @@ namespace CreationApp.Services
 
             var updated = await _dataContext.SaveChangesAsync();
 
-            return updated == 1;
+            if (updated == 1)
+            {
+                await _messagingService.SendMessageAsync("User edited " + DateTime.Now);
+                return true;
+            }
+
+            return false;
         }
     }
 }
