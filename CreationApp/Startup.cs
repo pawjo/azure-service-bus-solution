@@ -25,6 +25,7 @@ namespace CreationApp
             Configuration.Bind(nameof(serviceBusSettings), serviceBusSettings);
             services.AddSingleton(serviceBusSettings);
 
+            services.AddScoped<IMessagingService, MessagingService>();
             services.AddScoped<IUserService, UserService>();
 
             services.AddDbContext<DataContext>(options =>
