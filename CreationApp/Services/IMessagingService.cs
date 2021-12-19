@@ -4,6 +4,6 @@ namespace CreationApp.Services
 {
     public interface IMessagingService
     {
-        public Task<bool> SendMessage(string message);
+        public Task<bool> SendMessageAsync(string message);
     }
 }

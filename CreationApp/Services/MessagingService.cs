@@ -1,5 +1,6 @@
 ﻿using Azure.Messaging.ServiceBus;
 using CreationApp.Settings;
+using System;
 using System.Threading.Tasks;
 
 namespace CreationApp.Services
@@ -13,7 +14,7 @@ namespace CreationApp.Services
             _settings = settings;
         }
 
-        public async Task<bool> SendMessage(string messageBody)
+        public async Task<bool> SendMessageAsync(string messageBody)
         {
             await using (var client = new ServiceBusClient(_settings.ConnectionString))
             await using (var sender = client.CreateSender(_settings.QueueName))
