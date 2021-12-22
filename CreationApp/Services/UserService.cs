@@ -40,7 +40,15 @@ namespace CreationApp.Services
 
         public async Task<List<User>> GetActiveListAsync()
         {
-            return await _dataContext.Users.Where(x => x.Active).ToListAsync();
+            string sql = "SELECT * FROM [dbo].[User] WHERE Active = 1";
+            List<User> users;
+
+            using (var connection = new SqlConnection(_databaseConnectionString))
+            {
+                var queryResult = await connection.QueryAsync<User>(sql);
+                users = queryResult.ToList();
+            }
+            return users;
         }
 
         public async Task<User> GetByIdAsync(int id)
