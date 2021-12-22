@@ -20,6 +20,7 @@ namespace CreationApp.Services
 
         public async Task<bool> AddAsync(User newUser)
         {
+            newUser.Active = false;
             _dataContext.Users.Add(newUser);
             var added = await _dataContext.SaveChangesAsync();
 
@@ -60,7 +61,7 @@ namespace CreationApp.Services
             storedUser.Name = modifiedUser.Name;
             storedUser.Name = modifiedUser.Name;
             storedUser.Surname = modifiedUser.Surname;
-            storedUser.Active = modifiedUser.Active;
+            storedUser.Active = false;
 
             var updated = await _dataContext.SaveChangesAsync();
 
