@@ -1,14 +1,11 @@
 ﻿@model IEnumerable<CreationApp.Models.User>
 
 @{
-    ViewData["Title"] = "ActiveUsers";
+    ViewData["Title"] = "Active users";
 }
-<div class="row p-3">
-    <h1 class="col-3">Active users</h1>
-    <div class="col position-relative">
-        <a class="btn btn-success position-absolute top-50 translate-middle" asp-action="Create">Create New</a>
-    </div>
-</div>
+
+<h1 class="col-3 p-3">Active users</h1>
+
 <table class="table">
     <thead>
         <tr>
@@ -33,26 +30,26 @@
     <tbody>
         @foreach (var item in Model)
         {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Surname)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Age)
-            </td>
-            <td>
-                <a class="btn btn-success" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Surname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Age)
+                </td>
+                <td>
+                    <a class="btn btn-success" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                </td>
+            </tr>
         }
     </tbody>
 </table>

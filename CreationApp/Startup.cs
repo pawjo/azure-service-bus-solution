@@ -1,3 +1,5 @@
+using CreationApp.Services;
+using CreationApp.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +21,13 @@ namespace CreationApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var serviceBusSettings = new ServiceBusSettings();
+            Configuration.Bind(nameof(serviceBusSettings), serviceBusSettings);
+            services.AddSingleton(serviceBusSettings);
+
+            services.AddScoped<IMessagingService, MessagingService>();
+            services.AddScoped<IUserService, UserService>();
+
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("Default")));
 
