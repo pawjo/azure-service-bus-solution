@@ -25,17 +25,15 @@ namespace CreationApp.Services
 
         public async Task<bool> AddAsync(User newUser)
         {
-            newUser.Active = false;
-            _dataContext.Users.Add(newUser);
-            var added = await _dataContext.SaveChangesAsync();
+            string sql = "CreateNewUser @Email = @Email, @Name = @Name, @Surname = @Surname, @Age = @Age";
+            int added = 0;
 
-            if (added == 1)
+            using (var connection = new SqlConnection(_databaseConnectionString))
             {
-                await _messagingService.SendMessageAsync("User created " + DateTime.Now);
-                return true;
+                added = await connection.ExecuteAsync(sql, newUser);
             }
 
-            return false;
+            return added == 1;
         }
 
         public async Task<List<User>> GetActiveListAsync()
