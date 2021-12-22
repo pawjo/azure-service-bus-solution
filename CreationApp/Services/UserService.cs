@@ -1,5 +1,8 @@
 ﻿using CreationApp.Models;
+using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +14,13 @@ namespace CreationApp.Services
     {
         private readonly DataContext _dataContext;
         private readonly IMessagingService _messagingService;
+        private readonly string _databaseConnectionString;
 
-        public UserService(DataContext dataContext, IMessagingService messagingService)
+        public UserService(DataContext dataContext, IMessagingService messagingService, IConfiguration configuration)
         {
             _dataContext = dataContext;
             _messagingService = messagingService;
+            _databaseConnectionString = configuration.GetConnectionString("Default");
         }
 
         public async Task<bool> AddAsync(User newUser)
@@ -45,7 +50,15 @@ namespace CreationApp.Services
 
         public async Task<List<User>> GetListAsync()
         {
-            return await _dataContext.Users.ToListAsync();
+            string sql = "SELECT * FROM [dbo].[User]";
+            List<User> users;
+
+            using (var connection = new SqlConnection(_databaseConnectionString))
+            {
+                var queryResult = await connection.QueryAsync<User>(sql);
+                users = queryResult.ToList();
+            }
+            return users;
         }
 
         public async Task<bool> UpdateAsync(User modifiedUser)
