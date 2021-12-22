@@ -53,7 +53,22 @@ namespace CreationApp.Services
 
         public async Task<User> GetByIdAsync(int id)
         {
-            return await _dataContext.Users.SingleOrDefaultAsync(x => x.Id == id);
+            string sql = "SELECT * FROM [dbo].[User] WHERE Id = @UserId";
+            User user;
+
+            using (var connection = new SqlConnection(_databaseConnectionString))
+            {
+                // If there is more than one elements method should return null
+                try
+                {
+                    user = await connection.QuerySingleOrDefaultAsync<User>(sql, new { UserId = id });
+                }
+                catch
+                {
+                    user = null;
+                }
+            }
+            return user;
         }
 
         public async Task<List<User>> GetListAsync()
