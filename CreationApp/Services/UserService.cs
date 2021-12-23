@@ -13,19 +13,18 @@ namespace CreationApp.Services
 {
     public class UserService : IUserService
     {
-        private readonly DataContext _dataContext;
-        private readonly IMessagingService _messagingService;
         private readonly string _databaseConnectionString;
+        private readonly IMessagingService _messagingService;
 
-        public UserService(DataContext dataContext, IMessagingService messagingService, IConfiguration configuration)
+        public UserService(IConfiguration configuration, IMessagingService messagingService)
         {
-            _dataContext = dataContext;
-            _messagingService = messagingService;
             _databaseConnectionString = configuration.GetConnectionString("Default");
+            _messagingService = messagingService;
         }
 
         public async Task<bool> AddAsync(User newUser)
         {
+            // Adding dynamic parameters for not taking unnecessary properties and add output parameter
             var dynamicParameters = new DynamicParameters();
             dynamicParameters.Add("Email", newUser.Email, DbType.String, ParameterDirection.Input);
             dynamicParameters.Add("Name", newUser.Name, DbType.String, ParameterDirection.Input);
@@ -97,20 +96,20 @@ namespace CreationApp.Services
 
         public async Task<bool> UpdateAsync(User modifiedUser)
         {
-            var storedUser = await _dataContext.Users.SingleOrDefaultAsync(x => x.Id == modifiedUser.Id);
+            // Adding dynamic parameters for not taking unnecessary properties
+            var dynamicParameters = new DynamicParameters();
+            dynamicParameters.Add("Id", modifiedUser.Id);
+            dynamicParameters.Add("Email", modifiedUser.Email);
+            dynamicParameters.Add("Name", modifiedUser.Name);
+            dynamicParameters.Add("Surname", modifiedUser.Surname);
+            dynamicParameters.Add("Age", modifiedUser.Age);
 
-            if (storedUser == null)
+            int updated = 0;
+
+            using (var connection = new SqlConnection(_databaseConnectionString))
             {
-                return false;
+                updated = await connection.ExecuteAsync("UpdateUser", dynamicParameters, commandType: CommandType.StoredProcedure);
             }
-
-            storedUser.Email = modifiedUser.Email;
-            storedUser.Name = modifiedUser.Name;
-            storedUser.Name = modifiedUser.Name;
-            storedUser.Surname = modifiedUser.Surname;
-            storedUser.Active = false;
-
-            var updated = await _dataContext.SaveChangesAsync();
 
             if (updated == 1)
             {
