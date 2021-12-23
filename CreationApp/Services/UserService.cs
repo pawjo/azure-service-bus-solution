@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,15 +26,27 @@ namespace CreationApp.Services
 
         public async Task<bool> AddAsync(User newUser)
         {
-            string sql = "CreateNewUser @Email = @Email, @Name = @Name, @Surname = @Surname, @Age = @Age";
+            var dynamicParameters = new DynamicParameters();
+            dynamicParameters.Add("Email", newUser.Email, DbType.String, ParameterDirection.Input);
+            dynamicParameters.Add("Name", newUser.Name, DbType.String, ParameterDirection.Input);
+            dynamicParameters.Add("Surname", newUser.Surname, DbType.String, ParameterDirection.Input);
+            dynamicParameters.Add("Age", newUser.Age, DbType.Int32, ParameterDirection.Input);
+            dynamicParameters.Add("NewUserId", dbType: DbType.Int32, direction: ParameterDirection.Output);
             int added = 0;
 
             using (var connection = new SqlConnection(_databaseConnectionString))
             {
-                added = await connection.ExecuteAsync(sql, newUser);
+                added = await connection.ExecuteAsync("CreateNewUser", dynamicParameters, commandType: CommandType.StoredProcedure);
             }
 
-            return added == 1;
+            var newUserId = dynamicParameters.Get<dynamic>("NewUserId");
+            if (added == 1 && newUserId > 0)
+            {
+                await _messagingService.SendMessageAsync("User created " + DateTime.Now);
+                return true;
+            }
+
+            return false;
         }
 
         public async Task<List<User>> GetActiveListAsync()
