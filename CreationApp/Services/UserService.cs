@@ -1,7 +1,11 @@
 ﻿using CreationApp.Models;
+using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,22 +13,34 @@ namespace CreationApp.Services
 {
     public class UserService : IUserService
     {
-        private readonly DataContext _dataContext;
+        private readonly string _databaseConnectionString;
         private readonly IMessagingService _messagingService;
 
-        public UserService(DataContext dataContext, IMessagingService messagingService)
+        public UserService(IConfiguration configuration, IMessagingService messagingService)
         {
-            _dataContext = dataContext;
+            _databaseConnectionString = configuration.GetConnectionString("Default");
             _messagingService = messagingService;
         }
 
         public async Task<bool> AddAsync(User newUser)
         {
-            newUser.Active = false;
-            _dataContext.Users.Add(newUser);
-            var added = await _dataContext.SaveChangesAsync();
+            // Adding dynamic parameters for not taking unnecessary properties and add output parameter
+            var dynamicParameters = new DynamicParameters();
+            dynamicParameters.Add("Email", newUser.Email);
+            dynamicParameters.Add("Name", newUser.Name);
+            dynamicParameters.Add("Surname", newUser.Surname);
+            dynamicParameters.Add("Age", newUser.Age);
+            dynamicParameters.Add("NewUserId", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            if (added == 1)
+            int added = 0;
+
+            using (var connection = new SqlConnection(_databaseConnectionString))
+            {
+                added = await connection.ExecuteAsync("CreateNewUser", dynamicParameters, commandType: CommandType.StoredProcedure);
+            }
+
+            var newUserId = dynamicParameters.Get<dynamic>("NewUserId");
+            if (added == 1 && newUserId > 0)
             {
                 await _messagingService.SendMessageAsync("User created " + DateTime.Now);
                 return true;
@@ -35,35 +51,66 @@ namespace CreationApp.Services
 
         public async Task<List<User>> GetActiveListAsync()
         {
-            return await _dataContext.Users.Where(x => x.Active).ToListAsync();
+            string sql = "SELECT * FROM [dbo].[User] WHERE Active = 1";
+            List<User> users;
+
+            using (var connection = new SqlConnection(_databaseConnectionString))
+            {
+                var queryResult = await connection.QueryAsync<User>(sql);
+                users = queryResult.ToList();
+            }
+            return users;
         }
 
         public async Task<User> GetByIdAsync(int id)
         {
-            return await _dataContext.Users.SingleOrDefaultAsync(x => x.Id == id);
+            string sql = "SELECT * FROM [dbo].[User] WHERE Id = @UserId";
+            User user;
+
+            using (var connection = new SqlConnection(_databaseConnectionString))
+            {
+                // If there is more than one elements method should return null
+                try
+                {
+                    user = await connection.QuerySingleOrDefaultAsync<User>(sql, new { UserId = id });
+                }
+                catch
+                {
+                    user = null;
+                }
+            }
+            return user;
         }
 
         public async Task<List<User>> GetListAsync()
         {
-            return await _dataContext.Users.ToListAsync();
+            string sql = "SELECT * FROM [dbo].[User]";
+            List<User> users;
+
+            using (var connection = new SqlConnection(_databaseConnectionString))
+            {
+                var queryResult = await connection.QueryAsync<User>(sql);
+                users = queryResult.ToList();
+            }
+            return users;
         }
 
         public async Task<bool> UpdateAsync(User modifiedUser)
         {
-            var storedUser = await _dataContext.Users.SingleOrDefaultAsync(x => x.Id == modifiedUser.Id);
+            // Adding dynamic parameters for not taking unnecessary properties
+            var dynamicParameters = new DynamicParameters();
+            dynamicParameters.Add("Id", modifiedUser.Id);
+            dynamicParameters.Add("Email", modifiedUser.Email);
+            dynamicParameters.Add("Name", modifiedUser.Name);
+            dynamicParameters.Add("Surname", modifiedUser.Surname);
+            dynamicParameters.Add("Age", modifiedUser.Age);
 
-            if (storedUser == null)
+            int updated = 0;
+
+            using (var connection = new SqlConnection(_databaseConnectionString))
             {
-                return false;
+                updated = await connection.ExecuteAsync("UpdateUser", dynamicParameters, commandType: CommandType.StoredProcedure);
             }
-
-            storedUser.Email = modifiedUser.Email;
-            storedUser.Name = modifiedUser.Name;
-            storedUser.Name = modifiedUser.Name;
-            storedUser.Surname = modifiedUser.Surname;
-            storedUser.Active = false;
-
-            var updated = await _dataContext.SaveChangesAsync();
 
             if (updated == 1)
             {
