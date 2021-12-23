@@ -26,11 +26,12 @@ namespace CreationApp.Services
         {
             // Adding dynamic parameters for not taking unnecessary properties and add output parameter
             var dynamicParameters = new DynamicParameters();
-            dynamicParameters.Add("Email", newUser.Email, DbType.String, ParameterDirection.Input);
-            dynamicParameters.Add("Name", newUser.Name, DbType.String, ParameterDirection.Input);
-            dynamicParameters.Add("Surname", newUser.Surname, DbType.String, ParameterDirection.Input);
-            dynamicParameters.Add("Age", newUser.Age, DbType.Int32, ParameterDirection.Input);
+            dynamicParameters.Add("Email", newUser.Email);
+            dynamicParameters.Add("Name", newUser.Name);
+            dynamicParameters.Add("Surname", newUser.Surname);
+            dynamicParameters.Add("Age", newUser.Age);
             dynamicParameters.Add("NewUserId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
             int added = 0;
 
             using (var connection = new SqlConnection(_databaseConnectionString))
