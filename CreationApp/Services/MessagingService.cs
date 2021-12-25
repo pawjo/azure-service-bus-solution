@@ -1,4 +1,5 @@
-﻿using Azure.Messaging.ServiceBus;
+﻿using Azure.Core;
+using Azure.Messaging.ServiceBus;
 using CreationApp.Models;
 using CreationApp.Settings;
 using System;
@@ -47,6 +48,8 @@ namespace CreationApp.Services
             {
                 var jsonMessage = JsonSerializer.Serialize(message);
                 var sbMessage = new ServiceBusMessage(jsonMessage);
+                sbMessage.ContentType = "application/json";
+
                 try
                 {
                     await sender.SendMessageAsync(sbMessage);
