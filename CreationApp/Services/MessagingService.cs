@@ -1,6 +1,7 @@
 ﻿using Azure.Messaging.ServiceBus;
 using CreationApp.Models;
 using CreationApp.Settings;
+using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -20,7 +21,8 @@ namespace CreationApp.Services
             var message = new Message
             {
                 Type = 1,
-                UserId = userId
+                UserId = userId,
+                Date = DateTime.Now
             };
 
             return await SendMessageAsync(message);
@@ -31,7 +33,8 @@ namespace CreationApp.Services
             var message = new Message
             {
                 Type = 2,
-                UserId = userId
+                UserId = userId,
+                Date = DateTime.Now
             };
 
             return await SendMessageAsync(message);
