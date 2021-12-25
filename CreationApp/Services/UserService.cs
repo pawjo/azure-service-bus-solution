@@ -3,7 +3,6 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -42,7 +41,7 @@ namespace CreationApp.Services
             var newUserId = dynamicParameters.Get<dynamic>("NewUserId");
             if (added == 1 && newUserId > 0)
             {
-                await _messagingService.SendMessageAsync("User created " + DateTime.Now);
+                await _messagingService.SendCreateMessageAsync(newUserId);
                 return true;
             }
 
@@ -114,7 +113,7 @@ namespace CreationApp.Services
 
             if (updated == 1)
             {
-                await _messagingService.SendMessageAsync("User edited " + DateTime.Now);
+                await _messagingService.SendEditMessageAsync(modifiedUser.Id);
                 return true;
             }
 
