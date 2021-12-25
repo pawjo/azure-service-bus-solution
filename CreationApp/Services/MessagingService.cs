@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Azure.Messaging.ServiceBus;
+﻿using Azure.Messaging.ServiceBus;
 using CreationApp.Models;
 using CreationApp.Settings;
 using System;
