@@ -20,16 +20,16 @@ namespace CreationApp
                 entity.ToTable("User");
 
                 entity.Property(e => e.Email)
-                    .IsRequired()
                     .HasMaxLength(30);
 
                 entity.Property(e => e.Name)
-                    .IsRequired()
                     .HasMaxLength(20);
 
                 entity.Property(e => e.Surname)
-                    .IsRequired()
                     .HasMaxLength(30);
+
+                entity.Property(e => e.Age)
+                    .HasMaxLength(5);
             });
         }
     }
