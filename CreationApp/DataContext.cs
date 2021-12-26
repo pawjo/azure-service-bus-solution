@@ -34,15 +34,10 @@ namespace CreationApp
                     .HasMaxLength(5);
             });
 
-            //modelBuilder.Entity<Report>(entity =>
-            //{
-            //    entity.ToTable("Report");
-
-            //    entity.HasOne(x => x.User)
-            //        .WithMany()
-            //        .HasForeignKey(x => x.UserId)
-            //        .IsRequired();
-            //});
+            modelBuilder.Entity<Report>(entity =>
+            {
+                entity.ToTable("Report");
+            });
         }
     }
 }
