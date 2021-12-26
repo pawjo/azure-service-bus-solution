@@ -25,6 +25,7 @@ namespace ValidationApp
             services.AddSingleton(serviceBusSettings);
 
             services.AddSingleton<IUserService, UserService>();
+            services.AddSingleton<IReportService, ReportService>();
             services.AddSingleton<IServiceBusConsumer, ServiceBusConsumer>();
 
             services.AddHostedService<ServiceBusWorker>();
