@@ -51,7 +51,7 @@ namespace CreationApp.Services
                     var report = new ReportListItem
                     {
                         Id = item.Id,
-                        UserEmail = item.UserEmail,
+                        UserEmail = item.Email,
                         Date = item.Date,
                         Result = item.Result
                     };
