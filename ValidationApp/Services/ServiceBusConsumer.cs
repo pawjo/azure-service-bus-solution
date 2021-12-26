@@ -47,15 +47,22 @@ namespace CreationApp.Services
         }
 
 
-        public Task CloseQueueAsync()
+        public async Task CloseQueueAsync()
         {
-            throw new System.NotImplementedException();
+            await _processor.CloseAsync().ConfigureAwait(false);
         }
 
-        public ValueTask DisposeAsync()
+        public async ValueTask DisposeAsync()
         {
-            throw new System.NotImplementedException();
-        }
+            if (_processor != null)
+            {
+                await _processor.DisposeAsync().ConfigureAwait(false);
+            }
 
+            if (_client != null)
+            {
+                await _client.DisposeAsync().ConfigureAwait(false);
+            }
+        }
     }
 }
