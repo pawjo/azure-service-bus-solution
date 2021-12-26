@@ -1,14 +1,10 @@
 using CreationApp.Services;
+using CreationApp.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ValidationApp
 {
@@ -24,6 +20,10 @@ namespace ValidationApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var serviceBusSettings = new ServiceBusSettings();
+            Configuration.Bind(nameof(serviceBusSettings), serviceBusSettings);
+            services.AddSingleton(serviceBusSettings);
+
             services.AddSingleton<IUserService, UserService>();
             services.AddSingleton<IServiceBusConsumer, ServiceBusConsumer>();
 
