@@ -11,6 +11,8 @@ namespace CreationApp
 
         public virtual DbSet<User> Users { get; set; }
 
+        public virtual DbSet<Report> Reports { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -31,6 +33,16 @@ namespace CreationApp
                 entity.Property(e => e.Age)
                     .HasMaxLength(5);
             });
+
+            //modelBuilder.Entity<Report>(entity =>
+            //{
+            //    entity.ToTable("Report");
+
+            //    entity.HasOne(x => x.User)
+            //        .WithMany()
+            //        .HasForeignKey(x => x.UserId)
+            //        .IsRequired();
+            //});
         }
     }
 }
