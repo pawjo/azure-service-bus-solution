@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 using ValidationApp.ViewModels;
 
@@ -46,7 +47,7 @@ namespace CreationApp.Services
 
                 reportListViewModel.Reports = new List<ReportListItem>();
 
-                foreach (var item in queryResult)
+                foreach (var item in queryResult.Reverse())
                 {
                     var report = new ReportListItem
                     {
