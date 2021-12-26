@@ -13,9 +13,8 @@ namespace CreationApp.Services
         private readonly ServiceBusSettings _settings;
         private readonly IUserService _userService;
 
-        public ServiceBusConsumer(ServiceBusClient client, ServiceBusProcessor processor, ServiceBusSettings settings, IUserService userService)
+        public ServiceBusConsumer(ServiceBusSettings settings, IUserService userService)
         {
-            _processor = processor;
             _settings = settings;
             _userService = userService;
             _client = new ServiceBusClient(_settings.ConnectionString);
@@ -43,7 +42,7 @@ namespace CreationApp.Services
 
         private Task ProcessErrorAsync(ProcessErrorEventArgs args)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
 
