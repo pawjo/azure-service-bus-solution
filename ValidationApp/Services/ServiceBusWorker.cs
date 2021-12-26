@@ -7,20 +7,26 @@ namespace CreationApp.Services
 {
     public class ServiceBusWorker : IHostedService, IDisposable
     {
+        private readonly IServiceBusConsumer _serviceBusConsumer;
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public ServiceBusWorker(IServiceBusConsumer serviceBusConsumer)
         {
-            throw new NotImplementedException();
+            _serviceBusConsumer = serviceBusConsumer;
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            await _serviceBusConsumer.RegisterOnMessageHandlerAndReceiveMessages().ConfigureAwait(false);
         }
-        
-        public void Dispose()
+
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            await _serviceBusConsumer.CloseQueueAsync().ConfigureAwait(false);
+        }
+
+        public async void Dispose()
+        {
+            await _serviceBusConsumer.DisposeAsync().ConfigureAwait(false);
         }
     }
 }
