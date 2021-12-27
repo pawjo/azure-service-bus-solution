@@ -2,7 +2,7 @@ CREATE PROCEDURE CreateNewUser
 	@Email VARCHAR(30),
 	@Name VARCHAR(20),
 	@Surname VARCHAR(30),
-	@Age INT,
+	@Age VARCHAR(5),
 	@NewUserId INT OUTPUT
 AS
 BEGIN

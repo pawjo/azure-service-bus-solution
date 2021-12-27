@@ -1,8 +1,54 @@
-﻿@{
+﻿@model ValidationApp.ViewModels.ReportListViewModel
+@{
     ViewData["Title"] = "Home Page";
 }
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row">
+    <h1 class="col-5 p-3">Last validation reports</h1>
+    <a class="btn btn-success my-auto" asp-controller="Home" asp-action="Index">Refresh</a>
 </div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Id
+            </th>
+            <th>
+                User email
+            </th>
+            <th>
+                Report date
+            </th>
+            <th>
+                Result
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Reports)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserEmail)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Date)
+                </td>
+                <td>
+                    @if (item.Result == 2)
+                    {
+                        <span class="badge badge-success p-2">Success</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-danger p-2">Fail</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

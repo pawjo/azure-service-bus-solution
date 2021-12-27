@@ -1,6 +1,7 @@
 ﻿using CreationApp.Models;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Data.SqlClient;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -10,10 +11,12 @@ namespace CreationApp.Services
     public class UserService : IUserService
     {
         private readonly string _databaseConnectionString;
+        private readonly IReportService _reportService;
 
-        public UserService(IConfiguration configuration)
+        public UserService(IConfiguration configuration, IReportService reportService)
         {
             _databaseConnectionString = configuration.GetConnectionString("Default");
+            _reportService = reportService;
         }
 
         public async Task<bool> ActivateAsync(int userId)
@@ -61,8 +64,16 @@ namespace CreationApp.Services
 
             var result = !string.IsNullOrWhiteSpace(user.Name)
                 && !string.IsNullOrWhiteSpace(user.Surname)
-                && user.Age > 0
+                && AgeIsValid(user.Age)
                 && EmailIsValid(user.Email);
+
+            var report = new Report
+            {
+                UserId = userId,
+                Date = DateTime.Now,
+                Result = result ? 2 : 1
+            };
+            await _reportService.AddAsync(report);
 
             if (result)
             {
@@ -70,6 +81,18 @@ namespace CreationApp.Services
             }
 
             return result;
+        }
+
+        private bool AgeIsValid(string age)
+        {
+            bool result = int.TryParse(age, out int intAge);
+            if (result)
+            {
+                result = intAge > 0;
+            }
+
+            return age != null
+                && result;
         }
 
         private bool EmailIsValid(string email)

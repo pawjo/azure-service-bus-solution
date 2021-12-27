@@ -32,12 +32,7 @@ namespace CreationApp.Services
         {
             var message = args.Message.Body.ToObjectFromJson<Message>();
 
-            bool isValid = await _userService.ValidateAsync(message.UserId);
-
-            if (isValid)
-            {
-                await _userService.ActivateAsync(message.UserId);
-            }
+            await _userService.ValidateAsync(message.UserId);
         }
 
         private Task ProcessErrorAsync(ProcessErrorEventArgs args)
