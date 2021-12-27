@@ -38,7 +38,7 @@ namespace CreationApp.Services
 
         public async Task<ReportListViewModel> GetListAsync()
         {
-            var sql = "SELECT r.Id, u.Email, r.Date, r.Result FROM [dbo].[Report] r JOIN [dbo].[User] u ON r.UserId = u.Id";
+            var sql = "SELECT TOP 10 r.Id, u.Email, r.Date, r.Result FROM [dbo].[Report] r JOIN [dbo].[User] u ON r.UserId = u.Id ORDER BY r.Id DESC";
 
             var reportListViewModel = new ReportListViewModel();
             using (var connection = new SqlConnection(_databaseConnectionString))
@@ -47,7 +47,7 @@ namespace CreationApp.Services
 
                 reportListViewModel.Reports = new List<ReportListItem>();
 
-                foreach (var item in queryResult.Reverse())
+                foreach (var item in queryResult)
                 {
                     var report = new ReportListItem
                     {
