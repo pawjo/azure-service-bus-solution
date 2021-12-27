@@ -64,7 +64,7 @@ namespace CreationApp.Services
 
             var result = !string.IsNullOrWhiteSpace(user.Name)
                 && !string.IsNullOrWhiteSpace(user.Surname)
-                && user.Age > 0
+                && AgeIsValid(user.Age)
                 && EmailIsValid(user.Email);
 
             var report = new Report
@@ -81,6 +81,18 @@ namespace CreationApp.Services
             }
 
             return result;
+        }
+
+        private bool AgeIsValid(string age)
+        {
+            bool result = int.TryParse(age, out int intAge);
+            if (result)
+            {
+                result = intAge > 0;
+            }
+
+            return age != null
+                && result;
         }
 
         private bool EmailIsValid(string email)
