@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -24,6 +27,9 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Create">Create new user</a>
                         </li>
                     </ul>
+                    <div class="nav-item">
+                        <a class="nav-link text-dark" href="@Configuration["ValidationAppUrl"]">Validation App</a>
+                    </div>
                 </div>
             </div>
         </nav>
